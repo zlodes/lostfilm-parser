@@ -15,8 +15,6 @@ class CreateSeriesTable extends Migration
 
             $table->string('slug')->unique(); // Part of lostfilm.tv url
 
-            $table->date('release_date');
-
             $table->timestamps();
         });
     }

@@ -17,8 +17,6 @@ class CreateSeasonTable extends Migration
 
             $table->string('slug'); // Part of lostfilm.tv url
 
-            $table->date('release_date');
-
             $table->timestamps();
 
             $table->index('slug');

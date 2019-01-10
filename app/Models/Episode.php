@@ -25,10 +25,12 @@ class Episode extends Model
     protected $table = 'episodes';
 
     protected $fillable = [
+        'season_id',
         'name',
         'original_name',
         'slug',
         'release_date',
+        'lostfilm_url',
     ];
 
     public function season(): BelongsTo

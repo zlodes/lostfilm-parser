@@ -14,8 +14,6 @@ use Illuminate\Support\Collection;
  * @property string $name
  * @property string|null $original_name
  *
- * @property Carbon $release_date
- *
  * @property-read Carbon $created_at
  * @property-read Carbon $updated_at
  *
@@ -27,12 +25,13 @@ use Illuminate\Support\Collection;
  */
 class Season extends Model
 {
-    protected $table = 'series';
+    protected $table = 'seasons';
 
     protected $fillable = [
         'series_id',
         'name',
         'original_name',
+        'slug',
     ];
 
     public function series(): BelongsTo
