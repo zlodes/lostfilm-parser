@@ -53,16 +53,16 @@ Start the local development server
 
     php artisan serve
     
-## DEPLOYMENT 
+# DEPLOYMENT 
 
 For using application on production read the [Official guide](https://laravel.com/docs/5.6/deployment)
 
-## USAGE
+# USAGE
 Go to application home — default for local development server (`php artisan serve`) is 
 
     http://127.0.0.1:8000
 
-### Available actions
+## Available actions
 0. Use search input on the right side of header for filter tv series episodes
 0. Use pagination for walk through the pages 
 0. Use lostfilm.tv button to go to lostfilm.tv page about the episode
