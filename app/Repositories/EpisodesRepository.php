@@ -17,7 +17,6 @@ class EpisodesRepository extends Repository
     {
         $episodesQuery = $this->query();
 
-        // Use Laravel Scout only for getting keys (IDs) but we cant use full power of Eloquent with Scout Builder
         if ($search_string) {
             $episodesQuery->search($search_string);
         }
