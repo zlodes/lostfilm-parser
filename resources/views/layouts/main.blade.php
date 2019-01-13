@@ -27,7 +27,7 @@
 
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <form class="navbar-form navbar-right" action="{{ action('SeriesController@index') }}" method="get">
+                <form class="navbar-form navbar-right" action="{{ route('index') }}" method="get">
                     <div class="form-group">
                         <input type="search" class="form-control" name="q" placeholder="Поиск" value="{{ $query ?? '' }}">
                     </div>

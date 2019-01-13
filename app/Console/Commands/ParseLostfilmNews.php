@@ -16,8 +16,8 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class ParseLostfilmNews extends Command
 {
-    protected $signature = 'lostfilm:crawl-news-page';
-    protected $description = 'Crawls LostFilm.tv news page and update our movies database';
+    protected $signature = 'lostfilm:crawl-news-page {--first-run}';
+    protected $description = 'Crawls LostFilm.tv news page and update our movies database (use with --first-run for first run)';
 
     public function handle()
     {
@@ -32,8 +32,11 @@ class ParseLostfilmNews extends Command
             ],
         ]);
 
+        $is_first_run = $this->option('first-run');
+
         $current_page_number = 1;
         $last_page_number = null;
+        $progressBar = null;
 
         try {
             // Iterate pages
@@ -59,11 +62,15 @@ class ParseLostfilmNews extends Command
                     }
 
                     $last_page_number = (int) $pages_count_raw;
+
+                    // Create progress bar for first run
+                    $this->line("Pages progress:");
+                    $progressBar = $this->output->createProgressBar($last_page_number);
                 }
 
                 // Iterate news page rows
-                $pageDOM->filter('.content .body .row')->each(function (Crawler $row) {
-                    DB::transaction(function () use ($row) {
+                $pageDOM->filter('.content .body .row')->each(function (Crawler $row) use ($is_first_run) {
+                    DB::transaction(function () use ($row, $is_first_run) {
                         $episode_url = $row->filter('a')->first()->attr('href');
 
                         // Split url by "/" and remove empty parts
@@ -84,21 +91,23 @@ class ParseLostfilmNews extends Command
                                 'original_name' => $row->filter('.name-en')->text() ?: null,
                             ]);
 
+                        // Replace "N сезон M серия" with "N сезон" or skip for other season name structure (e.g. one word)
+                        $season_name = preg_replace('/^(\d{1,5}\s.+)\s(\d{1,5}\s.+)$/', '$1', $row->filter('.picture-box .left-part')->text());
+
                         // Get season by series and slug or create if not exists
                         /** @var Season $season */
                         $season = $series->seasons()->firstOrCreate([
                             'series_id' => $series->getKey(),
                             'slug' => $season_slug,
                         ], [
-                            'name' => $season_slug, // TODO: replace with real season name e.g. "Сезон 1"
-                            'original_name' => null, // TODO: replace with real season name e.g. "Season 1"
+                            'name' => $season_name,
+                            'original_name' => null, // TODO: do something with it...
                         ]);
 
                         // Check episode exists or not. Create if not exists otherwise throw exception (break all iterations)
                         /** @var Episode $episode */
-                        if ($episode = $season->episodes()->where('slug', $episode_slug)->first()) {
-                            // TODO: maybe go from last page to first? How to detect that we must not go next?..
-                            // throw new OldEpisodeFoundException($episode);
+                        if ( ! $is_first_run && $episode = $season->episodes()->where('slug', $episode_slug)->first()) {
+                             throw new OldEpisodeFoundException($episode);
                         }
 
                         $release_date = preg_replace('/^.+(\d\d)\.(\d\d)\.(\d{4})$/', '$3-$2-$1', $row->filter('.details-pane .alpha')->last()->text());
@@ -107,7 +116,7 @@ class ParseLostfilmNews extends Command
                         $episode = Episode::create([
                             'season_id' => $season->getKey(),
                             'name' => $row->filter('.details-pane .alpha')->first()->text(),
-                            'name_original' => $row->filter('.details-pane .beta')->first()->text(),
+                            'original_name' => $row->filter('.details-pane .beta')->first()->text(),
                             'slug' => $episode_slug,
                             'lostfilm_url' => config("crawling.lostfilm_base_uri").$episode_url,
                             'release_date' => $release_date,
@@ -119,7 +128,10 @@ class ParseLostfilmNews extends Command
                     });
                 });
 
-                // TODO: Add sleep
+                // Update progress bar for first run
+                if ($is_first_run) {
+                    $progressBar->advance();
+                }
 
                 $current_page_number++;
             } while ($current_page_number <= $last_page_number);

@@ -1,3 +1,3 @@
 <?php
 
-Route::get('/', 'SeriesController@index')->name('index');
+Route::get('/', 'EpisodesController@index')->name('index');

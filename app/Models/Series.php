@@ -3,9 +3,10 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Nexmo\Call\Collection;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property int $id
@@ -18,6 +19,9 @@ use Nexmo\Call\Collection;
  *
  * @property-read Collection|Season[] $seasons
  * @see Series::seasons()
+ *
+ * @property-read Collection|Episode[] $episodes
+ * @see Series::episodes()
  */
 class Series extends Model
 {
@@ -32,5 +36,10 @@ class Series extends Model
     public function seasons(): HasMany
     {
         return $this->hasMany(Season::class, 'series_id');
+    }
+
+    public function episodes(): HasManyThrough
+    {
+        return $this->hasManyThrough(Episode::class, Season::class);
     }
 }
