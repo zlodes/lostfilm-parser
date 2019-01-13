@@ -2,7 +2,7 @@
 
 ## Preparation
 0. Install PHP version 7.1 or higher
-0. Install MySQL 5.6.4l or higher
+0. Install MySQL 5.6 or higher
 0. Download composer: [Official Site](https://getcomposer.org/)
 
 ## Installation
@@ -56,3 +56,15 @@ Start the local development server
 ## DEPLOYMENT 
 
 For using application on production read the [Official guide](https://laravel.com/docs/5.6/deployment)
+
+## USAGE
+Go to application home — default for local development server (`php artisan serve`) is 
+
+    http://127.0.0.1:8000
+
+### Available actions
+0. Use search input on the right side of header for filter tv series episodes
+0. Use pagination for walk through the pages 
+0. Use lostfilm.tv button to go to lostfilm.tv page about the episode
+
+![Application main page](https://i.imgur.com/zd8nHgt.png)
